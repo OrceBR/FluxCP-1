@@ -66,14 +66,15 @@ class Flux_LoginServer extends Flux_BaseServer {
 	 */
 	public function isAuth($username, $password)
 	{
-		if ($this->config->get('UseMD5')) {
-			$password = Flux::hashPassword($password);
-		}
 		
 		if (trim($username) == '' || trim($password) == '') {
 			return false;
 		}
-		
+
+     	if ($this->config->get('UseMD5')) {
+			$password = Flux::hashPassword($password);
+		}
+        
 		$sql  = "SELECT userid FROM {$this->loginDatabase}.login WHERE sex != 'S' AND group_id >= 0 ";
 		if ($this->config->getNoCase()) {
 			$sql .= 'AND LOWER(userid) = LOWER(?) ';
@@ -109,7 +110,7 @@ class Flux_LoginServer extends Flux_BaseServer {
 			throw new Flux_RegisterError('Username is too long', Flux_RegisterError::USERNAME_TOO_LONG);
 		}
 		elseif (!Flux::config('AllowUserInPassword') && stripos($password, $username) !== false) {
-			throw new Flux_RegisterError('Password contains username', Flux_RegisterError::USERNAME_IN_PASSWORD);
+			throw new Flux_RegisterError('Password contains username', Flux_RegisterError::PASSWORD_HAS_USERNAME);
 		}
 		elseif (!ctype_graph($password)) {
 			throw new Flux_RegisterError('Invalid character(s) used in password', Flux_RegisterError::INVALID_PASSWORD);
